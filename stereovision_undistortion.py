@@ -19,15 +19,33 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     success_left, frame_left = cap_left.read()
     success_right, frame_right = cap_right.read()
     
-    # # Undistort and retify images
-    # frame_left = cv2.remap(frame_left, stereoMapL_x, stereoMapL_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
-    # frame_right = cv2.remap(frame_right, stereoMapR_x, stereoMapR_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+    # Undistort and retify images
+    frame_left = cv2.remap(frame_left, stereoMapL_x, stereoMapL_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+    frame_right = cv2.remap(frame_right, stereoMapR_x, stereoMapR_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
     
     # Gray the frame
-    frame_left = cv2.cvtColor(frame_left, cv2.COLOR_BGR2GRAY)
-    frame_right = cv2.cvtColor(frame_right, cv2.COLOR_BGR2GRAY)
-    stereo = cv2.StereoBM_create(numDisparities=16, blockSize=15)
-    disparity = stereo.compute(frame_left, frame_right)
+    min_disparity=16
+    num_disp=96
+    block_size=7
+    uniqueness=6
+    speckle_window_size=75
+    speckle_range=16
+    p1=216
+    p2=864
+    max_disparity=1
+
+    # Create Block matching object. 
+    stereo = cv2.StereoSGBM_create(minDisparity= min_disparity,
+        numDisparities = num_disp,
+        blockSize = block_size,
+        uniquenessRatio = uniqueness,
+        speckleWindowSize = speckle_window_size,
+        speckleRange = speckle_range,
+        disp12MaxDiff = max_disparity,
+        P1 = 8*3*block_size**2,#8*img_channels*block_size**2,
+        P2 = 32*3*block_size**2) #32*img_channels*block_size**2)
+    
+    disparity = stereo.compute(frame_left, frame_right).astype('float32') / 1024.0
     
     # Show the frame
     cv2.imshow('Left Cam', frame_left)

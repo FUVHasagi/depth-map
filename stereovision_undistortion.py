@@ -4,7 +4,7 @@ import cv2
 
 # Camera parameters to undistort and rectify images
 cv_file = cv2.FileStorage()
-cv_file.open(stereoMap.xml, cv2.FileStorage_READ)
+cv_file.open('stereoMap.xml', cv2.FileStorage_READ)
 
 stereoMapL_x = cv_file.getNode('stereoMapL_x').mat()
 stereoMapL_y = cv_file.getNode('stereoMapL_y').mat()
@@ -19,12 +19,15 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     success_left, frame_left = cap_left.read()
     success_right, frame_right = cap_right.read()
     
-    # Undistort and retify images
-    frame_left = cv2.remap(frame_left, stereoMapL_x, stereoMapL_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
-    frame_right = cv2.remap(frame_right, stereoMapR_x, stereoMapR_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+    # # Undistort and retify images
+    # frame_left = cv2.remap(frame_left, stereoMapL_x, stereoMapL_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+    # frame_right = cv2.remap(frame_right, stereoMapR_x, stereoMapR_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
     
-    stereo = cv.StereoBM_create(numDisparities=16, blockSize=15)
-    disparity = stereo.compute(imgL,imgR)
+    # Gray the frame
+    frame_left = cv2.cvtColor(frame_left, cv2.COLOR_BGR2GRAY)
+    frame_right = cv2.cvtColor(frame_right, cv2.COLOR_BGR2GRAY)
+    stereo = cv2.StereoBM_create(numDisparities=16, blockSize=15)
+    disparity = stereo.compute(frame_left, frame_right)
     
     # Show the frame
     cv2.imshow('Left Cam', frame_left)

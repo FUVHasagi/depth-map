@@ -15,8 +15,8 @@ while cap.isOpened():
     if k == 27:
         break
     elif k == ord('s'): # wait for 's' key to save
-        cv2.imwrite('images/stereoLeft/image/imageL' + str(num))
-        cv2.imwrite('images/stereoRight/image/image2' + str(num))
+        cv2.imwrite('images/stereoLeft/image/imageL' + str(num) + '.png', img)
+        cv2.imwrite('images/stereoRight/image/imageR' + str(num) + '.png', img2)
         print('Image saved')
         num+=1
     cv2.imshow('Img 1', img)
@@ -25,4 +25,4 @@ while cap.isOpened():
 cap.release()
 cap2.release()
 
-cv2.destroyAllWindow()
+cv2.destroyAllWindows()

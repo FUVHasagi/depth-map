@@ -22,8 +22,8 @@ objpoints = []  # 3d points in real world space
 imgpointsL = []
 imgpointsR = []
 
-imagesLeft = glob.glob('image/stereoLeft/*.png')
-imagesRight = glob.glob('images/stereoRight/*.png')
+imagesLeft = glob.glob('images/stereoLeft/image/*.png')
+imagesRight = glob.glob('images/stereoRight/image/*.png')
 
 for imgLeft, imgRight in zip(imagesLeft, imagesRight):
     imgL = cv.imread(imgLeft)
@@ -33,10 +33,10 @@ for imgLeft, imgRight in zip(imagesLeft, imagesRight):
     
     # Find the corners of the chessboard
     retL, cornersL = cv.findChessboardCorners(grayL, chessboardSize, None)
-    resR, cornersR = cv.findChessboardCorners(grayR, chessboardSize, None)
+    retR, cornersR = cv.findChessboardCorners(grayR, chessboardSize, None)
     
     # If found, add objects points, image points (after refining them)
-    if retL and retR == True:
+    if (retL and retR) == True:
         objpoints.append(objp)
         
         cornersL = cv.cornerSubPix(grayL, cornersL, (11,11), (-1, -1), criteria)
@@ -58,7 +58,7 @@ cv.destroyAllWindows()
 # CALIBRATION
 retL, cameraMatrixL, distL, rvecsL, tvecsL = cv.calibrateCamera(objpoints, imgpointsL, frameSize, None, None)
 heightL, widthL, channelsL = imgL.shape
-newCameraMatrixL, roiL = cv.getOptimalNewCameraMatrix(cameraMatrixL, distL, (widthL, heightL), 1, (widthL, heighL))
+newCameraMatrixL, roiL = cv.getOptimalNewCameraMatrix(cameraMatrixL, distL, (widthL, heightL), 1, (widthL, heightL))
 
 retR, cameraMatrixR, distR, rvecsR, tvecsR = cv.calibrateCamera(objpoints, imgpointsR, frameSize, None, None)
 heightR, widthR, channelsR = imgR.shape
@@ -68,7 +68,7 @@ newCameraMatrixR, roiR = cv.getOptimalNewCameraMatrix(cameraMatrixR, distR, (wid
 
 # STEREO VISION CALIBRATION
 flag = 0
-flag |= cv.CALIB_FIX_INSTRINSIC
+flag |= cv.CALIB_FIX_INTRINSIC
 # Here we fix the intrinsic camera matrix so that only Rot, Trans, Emat and Fmat are calculated
 # => intrinsic parameters are the same
 
@@ -76,8 +76,9 @@ criteria_stereo = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # This step is performed for transformation between the two cameras and
 # calculate Essential and Fundamental Matrixes
-retStereo, newCameraMatrixL, disL, newCameraMatrixR, distR, rot, trans, essentialMatrix, fundamentalMatrix = cv.stereoCalibrate(objpoints, imgpointsL, imgpointsR, newCameraMatrixL, distL, newCameraMatrixR, distR, grayL.shape[::-1], criteria_stereo, flags)
-
+retStereo, newCameraMatrixL, disL, newCameraMatrixR, distR, rot, trans, essentialMatrix, fundamentalMatrix = cv.stereoCalibrate(objpoints, imgpointsL, imgpointsR, newCameraMatrixL, distL, newCameraMatrixR, distR, grayL.shape[::-1], criteria_stereo, flag)
+print(newCameraMatrixL) 
+print(newCameraMatrixR)
 # STEREO RECTIFICATION
 ########## Stereo Rectification #################################################
 

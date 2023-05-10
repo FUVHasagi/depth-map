@@ -22,8 +22,8 @@ objpoints = []  # 3d points in real world space
 imgpointsL = []
 imgpointsR = []
 
-imagesLeft = glob.glob('images/stereoLeft/image/*.png')
-imagesRight = glob.glob('images/stereoRight/image/*.png')
+imagesLeft = glob.glob('images/stereoLeft/calib/*.png')
+imagesRight = glob.glob('images/stereoRight/calib/*.png')
 
 for imgLeft, imgRight in zip(imagesLeft, imagesRight):
     imgL = cv.imread(imgLeft)

@@ -15,7 +15,7 @@ stereoMapR_y = cv_file.getNode('stereoMapR_y').mat()
 # Open both cameras
 cap_left = cv2.VideoCapture(0, cv2.CAP_DSHOW) # Direct show
 cap_right = cv2.VideoCapture(2, cv2.CAP_DSHOW)
-
+num = 0
 while(cap_left.isOpened() and cap_right.isOpened()):    
     # Parameters from all steps are defined here to make it easier to adjust values.
     resolution     = 0.8    # (0, 1.0] the resolution of the new frame comparing to the old one
@@ -26,7 +26,7 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     lmbda          = 80000  # [80000, 100000]
     sigma          = 1.2
     brightness     = 0      # [-1.0, 1.0] Additional brightness for the final image
-    contrast       = 1      # [0.0, 3.0] Additional contrast for the final image
+    contrast       = 0.7     # [0.0, 3.0] Additional contrast for the final image
     speckle_range = 500
     AVG_RATIO = 0.025
     WINDOW_COLOR = (0, 255, 255)
@@ -44,6 +44,8 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     # frame_right0 = cv2.remap(frame_right0, stereoMapR_x, stereoMapR_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
     frame_left = cv2.cvtColor(frame_left0,cv2.COLOR_BGR2GRAY)
     frame_right = cv2.cvtColor(frame_right0,cv2.COLOR_BGR2GRAY)
+    frame_left = cv2.GaussianBlur(frame_left, (5,5), 0)
+    frame_right = cv2.GaussianBlur(frame_right, (5,5), 0)
     height, width = frame_left.shape[:2]
     
     
@@ -95,6 +97,7 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     filteredImg = cv2.resize(filteredImg, (width, height), interpolation = cv2.INTER_CUBIC) # Disparity truncation hack
     filteredImg = filteredImg[0:height, np.uint16(numDisparities / resolution):width]
     filteredImg = cv2.resize(filteredImg, (width, height), interpolation = cv2.INTER_CUBIC)  # Disparity truncation hack
+
     saved_disp = np.array(filteredImg)
     # Step 9 - Calculate the distance
     min_disp = filteredImg.min()
@@ -105,7 +108,7 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     else:
         # Calculate the average disparity of the center of the image
         center = np.mean(filteredImg[int(height*(0.5-AVG_RATIO)):int(height*(0.5+AVG_RATIO)), int(width*(0.5-AVG_RATIO)):int(width*(0.5+AVG_RATIO))])
-        center_disp = (center - min_disp) / 32
+        center_disp = (center - min_disp) / 64
         if center_disp <= 0:
             distance = 0
         else:
@@ -127,14 +130,13 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     
     
     # Hit 'q' to close the window or hit 's' to save
-    num = 0
+
     k = cv2.waitKey(1)
     if k == ord('s'):
-        cv2.imwrite('images/stereoLeft/o3d_input/imageL' + str(num) + '.png', frame_left0)
-        cv2.imwrite('images/stereoRight/o3d_input/imageR' + str(num) + '.png', frame_right0)
+        cv2.imwrite('images/stereoLeft/o3d_input/imageL' + str(num) + '.png', frame_left)
+        cv2.imwrite('images/stereoRight/o3d_input/imageR' + str(num) + '.png', frame_right)
         cv2.imwrite('images/disp_map/disp_map' + str(num) + '.png', saved_disp)
         print("Image and disparity map saved")
-        num+=1
     elif k == ord('p'):
         break
     

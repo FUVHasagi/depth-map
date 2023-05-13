@@ -17,6 +17,8 @@ while cap1.isOpened() and cap2.isOpened():
     elif k == ord('s'): # wait for 's' key to save
         cv2.imwrite('images/stereoLeft/calib/imageL' + str(num) + '.png', img1)
         cv2.imwrite('images/stereoRight/calib/imageR' + str(num) + '.png', img2)
+        # cv2.imwrite('images/stereoLeft/non_calib/imageL' + str(num) + '.png', img1)
+        # cv2.imwrite('images/stereoRight/non_calib/imageR' + str(num) + '.png', img2)
         print('Image saved')
         num+=1
     cv2.imshow('Img 1', img1)

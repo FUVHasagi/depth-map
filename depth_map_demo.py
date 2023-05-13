@@ -17,9 +17,6 @@ for imgColor, imgDepth in zip(imagesColor, imagesDepth):
         color_raw, depth_raw)
     print(rgbd_image)
 
-    
-    
-
     # # Camera intrinsic parameters built into Open3D for Prime Sense
     camera_intrinsic = o3d.camera.PinholeCameraIntrinsic(
     o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault)
@@ -32,7 +29,9 @@ for imgColor, imgDepth in zip(imagesColor, imagesDepth):
     o3d.visualization.draw_geometries([pcd])
     
 
-    o3d.io.write_point_cloud("images/o3d_output/" + imgColor + "_ptcloud.ply", pcd)
+    o3d.io.write_point_cloud("images/o3d_output/" + (imgColor.split('\\')[-1]).split('.')[0] + "_ptcloud.ply", pcd)
+    new_pcd = o3d.io.read_point_cloud("images/o3d_output/" + (imgColor.split('\\')[-1]).split('.')[0] + "_ptcloud.ply")
+    o3d.visualization.draw_geometries([new_pcd])
     # Plot the images
     plt.subplot(1, 2, 1)
     plt.title('Grayscale image')

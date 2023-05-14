@@ -39,7 +39,7 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     success_right, frame_right0 = cap_right.read()
 
     # Step 2 - Convert input to grayscale images and calibrate camera
-    # Undistort and retify images
+    # Undistort and retify images 
     # frame_left0 = cv2.remap(frame_left0, stereoMapL_x, stereoMapL_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
     # frame_right0 = cv2.remap(frame_right0, stereoMapR_x, stereoMapR_y, cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
     frame_left = cv2.cvtColor(frame_left0,cv2.COLOR_BGR2GRAY)
@@ -85,7 +85,7 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     disparityR = right_matcher.compute(resR, resL)
 
     # Step 7 - Perform post-filtering
-    imgLb = cv2.copyMakeBorder(frame_left, top = 0, bottom = 0, left = np.uint16(numDisparities / resolution), right = 0, borderType= cv2.BORDER_CONSTANT, value = [155,155,155])
+    imgLb = cv2.copyMakeBorder(frame_left, top = 0, bottom = 0, left = np.uint16(num_disp / resolution), right = 0, borderType= cv2.BORDER_CONSTANT, value = [155,155,155])
     filteredImg = wls_filter.filter(disparityL, imgLb, None, disparityR)
     # filteredImg = disparityL
     # Step 8 - Adjust image resolution, brightness, contrast, and perform disparity truncation hack
@@ -95,7 +95,7 @@ while(cap_left.isOpened() and cap_right.isOpened()):
     filteredImg = np.clip(filteredImg, 0, 255)
     filteredImg = np.uint8(filteredImg)
     filteredImg = cv2.resize(filteredImg, (width, height), interpolation = cv2.INTER_CUBIC) # Disparity truncation hack
-    filteredImg = filteredImg[0:height, np.uint16(numDisparities / resolution):width]
+    filteredImg = filteredImg[0:height, np.uint16(num_disp / resolution):width]
     filteredImg = cv2.resize(filteredImg, (width, height), interpolation = cv2.INTER_CUBIC)  # Disparity truncation hack
 
     saved_disp = np.array(filteredImg)
